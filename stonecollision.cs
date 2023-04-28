@@ -2,26 +2,16 @@ using UnityEngine;
 
 public class StoneCollision : MonoBehaviour
 {
-    public int damage = 1;
-    private Health health;
-    private float lastDamageTime;
-    public float damageCooldown = 0.2f;
+    public int damage = 25;
 
-    private void Start()
+    void OnTriggerEnter(Collider other)
     {
-        health = GameObject.FindWithTag("Player").GetComponent<Health>();
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Enemy"))
+        if (other.gameObject.CompareTag("Player"))
         {
-            if (Time.time > lastDamageTime + damageCooldown)
+            Health playerHealth = other.gameObject.GetComponent<Health>();
+            if (playerHealth != null)
             {
-                Health enemyHealth = other.GetComponent<Health>();
-                enemyHealth.TakeDamage(damage, gameObject);
-                lastDamageTime = Time.time;
-                Destroy(gameObject); 
+                playerHealth.TakeDamage(damage, gameObject); 
             }
         }
     }
