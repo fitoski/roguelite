@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.Collections;
 
 public class Health : MonoBehaviour
 {
@@ -13,6 +14,8 @@ public class Health : MonoBehaviour
     private Slider healthBarSlider;
     public int experienceReward = 1;
     private PlayerExperience playerExperience;
+    public float invulnerabilityDuration = 0.5f;
+    private bool isInvulnerable = false;
 
 
     private void Start()
@@ -28,23 +31,34 @@ public class Health : MonoBehaviour
 
     }
 
+    private IEnumerator Invulnerability()
+    {
+        isInvulnerable = true;
+        yield return new WaitForSeconds(invulnerabilityDuration);
+        isInvulnerable = false;
+    }
 
 
 
     public void TakeDamage(int damage, GameObject attacker)
     {
-        if (gameObject.CompareTag("Player") && attacker.CompareTag("Player"))
-        {
-            return;
-        }
+        if (isInvulnerable || attacker == gameObject) return;
 
         currentHealth -= damage;
-        UpdateHealthBar();
+
         if (currentHealth <= 0)
         {
             Die(attacker);
         }
+        else
+        {
+            StartCoroutine(Invulnerability());
+        }
+
+        UpdateHealthBar();
     }
+
+
 
 
 
@@ -84,9 +98,20 @@ public class Health : MonoBehaviour
         }
         else
         {
+            if (attacker != null && attacker.CompareTag("Player"))
+            {
+                PlayerExperience playerExperience = attacker.GetComponent<PlayerExperience>();
+                if (playerExperience != null)
+                {
+                    Debug.Log("Player gains " + experienceReward + " experience points."); 
+                    playerExperience.GainExperience(experienceReward);
+                }
+            }
             Destroy(gameObject);
         }
     }
+
+
 
 
 
