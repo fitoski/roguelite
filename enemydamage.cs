@@ -16,7 +16,6 @@ public class EnemyDamage : MonoBehaviour
 
         if (player == null)
         {
-            Debug.LogError("Player not found!");
         }
 
         PlayerExperience playerExperience = FindObjectOfType<PlayerExperience>();
@@ -54,7 +53,6 @@ public class EnemyDamage : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Player health component not found!");
         }
     }
 }
