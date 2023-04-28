@@ -1,59 +1,101 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class Health : MonoBehaviour
 {
     public int maxHealth = 100;
-    public int currentHealth;
-    public float invulnerabilityDuration = 0.5f;
+    private int currentHealth;
+    public Vector3 healthBarOffset = new Vector3(0, 0, 0);
 
-    private bool isInvulnerable = false;
+    public GameObject healthBarPrefab;
+    private GameObject healthBarObject;
+    private Slider healthBarSlider;
+    public int experienceReward = 1;
+    private PlayerExperience playerExperience;
 
-    void Start()
+
+    private void Start()
     {
         currentHealth = maxHealth;
+        healthBarObject = Instantiate(healthBarPrefab, transform.position, Quaternion.identity);
+        healthBarObject.transform.SetParent(FindObjectOfType<Canvas>().transform);
+        healthBarObject.transform.position = Camera.main.WorldToScreenPoint(transform.position + healthBarOffset);
+        healthBarSlider = healthBarObject.GetComponentInChildren<Slider>();
+        healthBarSlider.maxValue = maxHealth;
+        healthBarSlider.value = currentHealth;
+        playerExperience = FindObjectOfType<PlayerExperience>();
+
     }
+
+
+
 
     public void TakeDamage(int damage, GameObject attacker)
     {
-        if (isInvulnerable) return;
+        if (gameObject.CompareTag("Player") && attacker.CompareTag("Player"))
+        {
+            return;
+        }
 
         currentHealth -= damage;
-
+        UpdateHealthBar();
         if (currentHealth <= 0)
         {
             Die(attacker);
         }
-        else
+    }
+
+
+
+
+    private void UpdateHealthBar()
+    {
+        if (healthBarSlider == null)
         {
-            StartCoroutine(Invulnerability());
+            Debug.LogError("Health Bar Slider not found for " + gameObject.name);
+            return;
+        }
+
+        healthBarSlider.value = currentHealth;
+        healthBarObject.transform.position = Camera.main.WorldToScreenPoint(transform.position + healthBarOffset);
+    }
+
+    private void Update()
+    {
+        if (healthBarObject != null)
+        {
+            healthBarObject.transform.position = Camera.main.WorldToScreenPoint(transform.position + healthBarOffset);
         }
     }
 
-    public void ResetCurrentHealth(GameObject attacker)
+    public void ResetCurrentHealth()
     {
         currentHealth = maxHealth;
+        UpdateHealthBar();
     }
 
-    private void Die(GameObject attacker)
+
+    private void Die(GameObject attacker = null)
     {
-        if (gameObject.CompareTag("Enemy") && attacker.CompareTag("Player"))
+        if (gameObject.CompareTag("Player"))
         {
-            PlayerExperience playerExperience = attacker.GetComponent<PlayerExperience>();
-            if (playerExperience != null)
-            {
-                playerExperience.GainExperience(1);
-            }
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
-
-        Destroy(gameObject);
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
-    private IEnumerator Invulnerability()
+
+
+
+    private void OnDestroy()
     {
-        isInvulnerable = true;
-        yield return new WaitForSeconds(invulnerabilityDuration);
-        isInvulnerable = false;
+        if (healthBarObject != null)
+        {
+            Destroy(healthBarObject);
+        }
     }
 }
