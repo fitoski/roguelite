@@ -14,10 +14,10 @@ public class Enemy : MonoBehaviour
 
         if (playerExperience != null)
         {
-            float healthMultiplier = Mathf.Pow(2, playerExperience.level - 1);
+            float healthMultiplier = 1 + 0.2f * (playerExperience.level - 1);
             currentHealth = Mathf.RoundToInt(baseHealth * healthMultiplier);
             healthComponent.maxHealth = currentHealth;
-            healthComponent.ResetCurrentHealth(gameObject);
+            healthComponent.ResetCurrentHealth();
         }
     }
 }
