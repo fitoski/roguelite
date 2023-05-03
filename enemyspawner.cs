@@ -57,7 +57,7 @@ public class EnemySpawner : MonoBehaviour
         }
         else
         {
-            SpawnEnemy(); 
+            SpawnEnemy();
         }
     }
 }
