@@ -7,7 +7,7 @@ public class PlayerController : MonoBehaviour
     public GameObject stonePrefab;
     public float throwInterval = 1f;
     private float nextThrowTime = 0f;
-    private Vector3 _spawnPoint => new Vector3(transform.position.x, 0.5f, transform.position.z);
+    private Vector3 _spawnPoint => transform.position + transform.forward * 1f + new Vector3(0, 0.5f, 0);
     public float throwForce = 500f;
 
     void Update()
